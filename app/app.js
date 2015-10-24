@@ -1,4 +1,4 @@
-var app_path = __dirname;
+var app_path = global.app_path = __dirname;
 
 require('app-module-path').addPath(app_path);
 
@@ -8,7 +8,21 @@ var koaRouter = require('koa-router');
 var koaStatic = require('koa-static');
 var koaBodyParser = require('koa-bodyparser');
 var koaEjs = require('koa-ejs');
+var Config = require('libs/config');
 var routeLoader = require('libs/routeLoader');
+var DataSources = require('libs/datasources');
+
+
+var config = global.config = Config.generate([
+  require('config/config.js'),
+  require('config/config.local.js')
+]);
+
+
+
+DataSources.setInstance(new DataSources(config('data_sources')));
+
+
 
 var app = module.exports = koa();
 
@@ -22,8 +36,8 @@ koaEjs(app, {
   root: path.join(app_path, 'views'),
   layout: false, //'template',
   viewExt: 'html',
-  cache: false,  // !config.debug
-  debug: true,  // config.debug
+  cache: !config('debug'),
+  debug: config('debug')
   //filters: filters
 });
 
@@ -32,11 +46,11 @@ koaEjs(app, {
 /**
  * Static file serving
  */
-var public_dir = path.join(app_path, '../public'); //config.public_dir
+var public_dir = path.join(app_path, config('public_dir'));
 app.use(koaStatic(public_dir, {
-  maxage: 0,   // config.file_cache_age
-  index: 'index.html',  // config.index_file
-  defer: true  // config.routes_overload_static
+  maxage: config('file_server.cache_length'),
+  index: config('file_server.index'),
+  defer: !config('file_server.overload_routes')
 }));
 
 
