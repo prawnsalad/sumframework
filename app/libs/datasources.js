@@ -17,12 +17,15 @@ DataSources.get = function() {
 
 
 DataSources.prototype.get = function(name) {
+	var source_config ;
+	var connection;
+
+
 	if (!this.sources[name]) {
 		throw new Error('No data source named "' + name + '"');
 	}
 
-	var source_config = this.sources[name];
-	var connection;
+	source_config = this.sources[name];
 
 	if (!source_config.type) {
 		throw new Error('Missing type for data source "' + name + '"');
