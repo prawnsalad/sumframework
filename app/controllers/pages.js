@@ -7,8 +7,8 @@ module.exports = {
 		});
 	},
 
-	contact: function *(next) {
+	contact: function *() {
 		var user = yield Users.where('name', '=', 'darren').select();
-		this.body = JSON.stringify(user);
+		this.reply(user);
 	}
 };

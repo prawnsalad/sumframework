@@ -15,18 +15,28 @@ module.exports = {
 
 	data_sources: {
 		main: {
-			type     : 'mysql',
-			host     : '127.0.0.1',
-			user     : 'your_database_user',
-			password : 'your_database_password',
-			database : 'myapp_test'
+			type: 'mysql',
+			host: '127.0.0.1',
+			user: 'your_database_user',
+			password: 'your_database_password',
+			database: 'myapp_test'
 		},
 		other: {
-			type     : 'sqlite3',
-			filename : '../appdb.sqlite3'
+			type: 'sqlite3',
+			filename: '../appdb.sqlite3'
 		},
 		someRemoteApi: {},
 		aPostgreSQLDB: {},
 		aMongoDB: {}
+	},
+
+
+	sessions: {
+		cookie_name: 'sid',
+
+		storage: 'memory',
+		memory: {},
+		redis: {},
+		cookie: {},
 	}
 };

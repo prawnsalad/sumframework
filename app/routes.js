@@ -9,8 +9,8 @@ module.exports = function(route) {
 	route('/about', 'pages.about');
 
 	// Inline route function
-	route('/time', function *(next) {
-		this.body = Date.now();
+	route('/time', function *() {
+		this.reply(Date.now());
 	});
 
 	// Filters / plugins / middleware for this single route
