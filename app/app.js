@@ -10,6 +10,7 @@ var koaBodyParser = require('koa-bodyparser');
 var koaSession = require('koa-generic-session');
 var koaFlash = require('koa-flash');
 var koaRedisStore = require('koa-redis');
+var koaCsrf = require('koa-csrf');
 var koaEjs = require('koa-ejs');
 var Config = require('libs/config');
 var routeLoader = require('libs/routeLoader');
@@ -98,7 +99,28 @@ app.use(koaFlash({
 
 
 /**
- * Add some ctx.reply() suger
+ * CSRF protection
+ */
+koaCsrf(app);
+app.use(function *(next) {
+	// Add the ctx.csrfCheck() function
+	this.csrfCheck = (body) => {
+		try {
+			this.assertCsrf(body || this.request.body);
+			return true;
+		} catch (err) {
+			console.log(err.stack);
+			return false;
+		}
+	};
+
+	yield next;
+});
+
+
+
+/**
+ * Add some ctx.reply() sugar
  * ctx.reply(body)
  * ctx.reply(body, status)
  * ctx.reply(body, headers)

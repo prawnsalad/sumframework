@@ -13,6 +13,16 @@ module.exports = function(route) {
 		this.reply(Date.now());
 	});
 
+	route('/forms', function *() {
+		//var passed_csrf = this.csrfCheck();
+		console.log('token:', this.csrf);
+		yield this.render('forms', {
+			csrf: this.csrf,
+			passed_csrf: this.csrfCheck(), //passed_csrf,
+			phrase: this.request.body.phrase || ''
+		});
+	});
+
 	// Filters / plugins / middleware for this single route
 	//route('/secret', require('filters/isAdmin'), 'admin/dashboard');
 };
