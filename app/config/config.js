@@ -17,6 +17,7 @@ module.exports = {
 		main: {
 			type: 'mysql',
 			host: '127.0.0.1',
+			port: 3306,
 			user: 'your_database_user',
 			password: 'your_database_password',
 			database: 'myapp_test'
@@ -38,5 +39,11 @@ module.exports = {
 		memory: {},
 		redis: {},
 		cookie: {},
+	},
+
+
+	auth: {
+		load_on_routes: true,
+		user_model: 'models/users'
 	}
 };

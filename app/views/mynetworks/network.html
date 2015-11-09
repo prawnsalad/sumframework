@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>rgr</title>
+	<link rel="stylesheet" href="/css/foundation.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+</head>
+<body>
+
+	<style>
+		body {
+			background: #f3f3f3;
+		}
+		a { cursor: pointer; }
+
+
+		.side-menu {
+			position: fixed;
+			top: 0;
+			height: 100%;
+			left: 0;
+			width: 200px;
+			overflow-y: auto;
+			border-right: 5px #e6e6e6 solid;
+			background: #fff;
+		}
+
+		.main-page {
+			margin-left: 200px;
+		}
+
+
+
+
+		.network-list ul {
+			padding-left: 0;
+		}
+		.network-list li {
+			border-bottom: 1px #e6e6e6 solid;
+			list-style: none;
+		}
+		.network-list a {
+			padding: 10px;
+			display: block;
+		}
+		.network-list-sub {
+			display: none;
+			padding-left: 10px;
+			background: #f3f3f3;
+		}
+		.network-list-sub a {
+			padding: 5px;
+		}
+
+
+
+		.network-server {
+			padding: 10px 25px;
+			border-bottom: 1px solid #CACACA;
+		}
+		.network-server h4 {
+			display: inline-block;
+		}
+		.network-server .status-icon {
+		    margin-right: 5px;
+		    font-size: 1.3em;
+		}
+		.network-server .status-icon.fa-check-circle {
+			color: #6DA94F;
+		}
+		.network-server .status-icon.fa-times-circle {
+			color: #A94F4F;
+		}
+		.network-server-label {
+			margin-left: 15px;
+		}
+		.network-server-app {
+			background: #fff;
+			padding: 5px 10px;
+			margin-top: 10px;
+			border: 2px solid #E6E6E6;
+		}
+		.network-server-app:empty {
+			display: none;
+		}
+
+
+		.network-server-settings h5 {
+			border-bottom: 1px solid #ccc;
+			padding-bottom: 5px;
+			margin-top: 20px;
+		}
+		.network-server-settings h5:first-child {
+			margin-top: 10px;
+		}
+
+
+		.network-server-log h5 {
+			display: inline-block;
+			margin-right: 10px;
+		}
+		.network-server-log .fa-refresh.fa-spin {
+			color: orange;
+		}
+		.network-server-log-entries li {
+			font-family: monospace;
+			border-bottom: 1px dashed #999;
+		}
+
+
+		.network-access {
+			padding: 10px 25px;
+		}
+
+
+
+
+.alert-box {
+  padding: 1.3rem;
+  border-width: 0 0 0 0.35rem;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1rem; }
+  .alert-box.radius {
+    border-radius: 0.6rem; }
+  .alert-box.primary {
+    border-left-color: #446cb3;
+    background-color: #8da6d4; }
+    .alert-box.primary strong {
+      color: #446cb3; }
+  .alert-box.secondary {
+    border-left-color: #adb2bd;
+    background-color: #ced1d7; }
+    .alert-box.secondary strong {
+      color: #adb2bd; }
+  .alert-box.info {
+    border-left-color: #89c4f4;
+    background-color: #b8dcf8; }
+    .alert-box.info strong {
+      color: #89c4f4; }
+  .alert-box.alert {
+    border-left-color: #f22613;
+    background-color: #f77d71; }
+    .alert-box.alert strong {
+      color: #f22613; }
+  .alert-box.success {
+    border-left-color: #87d37c;
+    background-color: #b7e5b0; }
+    .alert-box.success strong {
+      color: #87d37c; }
+  .alert-box.warning {
+    border-left-color: #f89406;
+    background-color: #fbbf69; }
+    .alert-box.warning strong {
+      color: #f89406; }
+
+	</style>
+
+
+	<div class="side-menu">
+	</div>
+
+	<div class="main-page">
+	</div>
+
+
+
+	<template id="tmpl-network-list">
+		<div class="network-list">
+			<ul>
+				<li v-for="network in networks">
+					<a v-on:click.prevent="expandMenu">{{network.title}}</a>
+					<div class="network-list-sub">
+						<a href="/" v-on:click.prevent="showNetwork(network.id)">Servers</a>
+						<a href="/">Monitoring</a>
+						<a href="/" v-on:click.prevent="showAccessList(network.id)">Access List</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</template>
+
+
+	<template id="tmpl-alert-error">
+		<div v-if="error" style="text-align:center;">
+			<div style="display:inline-block;" class="alert-box alert radius"><strong>Error - </strong>{{error}}</div>
+		</div>
+	</template>
+
+	<template id="tmpl-alert-success">
+		<div v-if="error" style="text-align:center;">
+			<div style="display:inline-block;" class="alert-box success radius"><strong>OK! - </strong>{{text}}</div>
+		</div>
+	</template>
+
+
+
+	<template id="tmpl-server-list">
+		<div class="network-server-list">
+			<h3>Servers for {{network.title}}</h3>
+			<p>Users connecting to <i>{{network.url}}</i> or any of the addresses below will use your configuration. See <a>here</a> for more information on how Kiwi IRC chooses your server configuration.</p>
+
+			<partial v-if="error" name="alert-error"></partial>
+
+			<server v-for="server in servers" v-bind:server="server"></server>
+		</div>
+	</template>
+
+
+	<template id="tmpl-server">
+		<div class="network-server">
+			<div>
+				<i class="status-icon fa" v-bind:class="{ 'fa-check-circle': server.verified, 'fa-times-circle': !server.verified}"></i>
+				<h4>{{server.address}}</h4>
+				<span v-if="!server.verified && server.verify_err" class="network-server-label round alert label">{{friendlyVerificationError}}</span>
+			</div>
+			<div>
+				(smartlines here)
+				<a v-on:click="showSettings($index, $event)" class="btn btn-primary" role="button">Settings</a>
+				<a v-on:click="showLog" class="btn btn-primary" role="button" href="#">Activity Log</a>
+			</div>
+
+			<component :is="server_app" v-bind:server="server" class="network-server-app"></component>
+		</div>
+	</template>
+
+
+	<template id="tmpl-server-settings">
+		<div class="network-server-settings">
+			<form style="max-width:300px;">
+
+				<div class="row">
+					<div class="large-12 columns">
+						<h5>Connection</h5>
+					</div>
+
+					<div class="small-6 columns">
+						<label>Port
+							<input type="text" v-model="server.port" class="form-control" />
+						</label>
+					</div>
+
+					<div class="small-6 columns">
+						<label>SSL Port
+							<input type="text" v-model="server.port_ssl" class="form-control" />
+						</label>
+					</div>
+				</div>
+
+
+				<div class="row">
+					<div class="large-12 columns">
+						<h5>User hostnames &amp; webirc</h5>
+
+						<label>Web IRC password
+							<input type="text" v-model="server.webirc_password" class="form-control" />
+						</label>
+						<p class="help-block">Show the users hostnames correctly on your network <a href="/"><i class="fa fa-question-circle"></i></a></p>
+					</div>
+				</div>
+
+
+				<div class="row">
+					<div class="large-12 columns">
+						<h5>Usernames / Idents</h5>
+
+						<label>
+							<input type="radio" v-model="server.username" value="default">
+							Default
+						</label>
+
+						<label>
+							<input type="radio" v-model="server.username" value="ip_as_username">
+							Hexed IP address (IPv4 only)
+							<p class="help-block">Use the users IP address as the username in hex form</p>
+						</label>
+
+						<label>
+							<input type="radio" v-model="server.username" value="custom">
+							Custom username
+							<input v-show="server.username == 'custom'" v-model="server.username_custom" type="text" class="form-control" />
+						</label>
+					</div>
+				</div>
+			</form>
+		</div>
+	</template>
+
+
+
+	<template id="tmpl-server-log">
+		<div class="network-server-log">
+			<h5>Server log</h5>
+			<a v-on:click="refresh"><i class="fa fa-refresh" v-bind:class="{'fa-spin': is_loading}"></i></a>
+			<div class="network-server-log-entries">
+				<ul class="fa-ul">
+					<li v-for="entry in entries"><i class="fa-li fa fa-long-arrow-right"></i>{{entry.date}} - {{entry.text}}</li>
+				</ul>
+			</div>
+		</div>
+	</template>
+
+
+
+
+
+
+	<template id="tmpl-network-access">
+		<div class="network-access">
+			<h3>Access list</h3>
+			<a v-on:click="refresh"><i class="fa fa-refresh" v-bind:class="{'fa-spin': is_loading}"></i></a>
+			<p>{{users.length}} other people can administer this network.</p>
+			<table>
+				<tr v-for="user in users">
+					<td>{{user.email}}</td>
+					<td>{{user.added}}</td>
+					<td><button class="button small" v-on:click="confirmAndDeleteUser(user.id)">Remove</button></td>
+				</tr>
+			</table>
+		</div>
+	</template>
+
+
+
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="http://cdn.jsdelivr.net/vue/1.0.1/vue.min.js"></script>
+<script src="/js/mynetworks.js"></script>
+
+</body>
+
+</html>
