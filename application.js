@@ -41,7 +41,7 @@ function configureApplication(app) {
 	var Auth = require('./auth');
 
 
-	var config = global.config = Config.generate([
+	var config = app.config = Config.generate([
 		require('config/config.js'),
 		require('config/config.local.js')
 	]);
