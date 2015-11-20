@@ -1,7 +1,0 @@
-<%= passed_csrf ? 'passed check' : 'failed checks' %>
-<%= phrase %>
-<form action="/forms" method="post">
-	<input type="input" name="_csrf" value="<%= csrf %>" /> <br />
-	<input type="textarea" name="phrase" />
-	<button type="submit">Send..</button>
-</form>
